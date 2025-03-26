@@ -1,2 +1,0 @@
-car with controls, cuboids are ok for the car
-the light should be the sun, movable? lightning?  

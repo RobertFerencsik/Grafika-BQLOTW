@@ -1,5 +1,5 @@
 #include "matrix.h"
-
+#include <math.h>
 #include <stdio.h>
 
 void init_zero_matrix(float matrix[3][3])
@@ -15,13 +15,15 @@ void init_zero_matrix(float matrix[3][3])
 }
 
 void init_identity_matrix(float matrix[3][3]) 
-{
-	int i,j;
-	
+{	
+    int i;
+    int j;
+	init_zero_matrix(matrix);
 	for(i = 0; i < 3; i++) {
-			for(j = 0; j < 3; j++) {
+		for(j = 0; j < 3; j++) {
+			if(j == i)
 				matrix[i][j] = 1.0;
-			}
+		}
 	}
 }
 
@@ -68,7 +70,7 @@ void transform_point(const float transformationMatrix[3][3],const float point[3]
 	int i,j;
 	
 	for(i = 0; i < 3;i++) {
-		sum = 0;
+		float sum = 0;
 		for(j = 0; j < 3; j++) {
 			sum = transformationMatrix[i][j] * result[j];
 		}
@@ -76,14 +78,23 @@ void transform_point(const float transformationMatrix[3][3],const float point[3]
 	}
 }
 
-void scale(float transformationMatrix, float scale) {
-	
+void scale(float transformationMatrix[3][3], float lambda) {
+	init_identity_matrix(transformationMatrix);
+	transformationMatrix[0][0] = lambda;
+	transformationMatrix[1][1] = lambda;
 }
 
-void shift(float transformationMatrix) {
-	
+void shift(float transformationMatrix[3][3], float dx, float dy) {
+	init_identity_matrix(transformationMatrix);
+	transformationMatrix[0][2] = dx;
+	transformationMatrix[1][2] = dy;
 }
 
-void rotate(float transformationMatrix) {
-	
+void rotate(float transformationMatrix[3][3], float fi) {
+	init_identity_matrix(transformationMatrix);
+	fi = (fi / 180) * M_PI;
+	transformationMatrix[0][0] = cos(fi);
+	transformationMatrix[1][1] = cos(fi);
+	transformationMatrix[0][1] = -sin(fi);
+	transformationMatrix[1][0] = sin(fi);
 }

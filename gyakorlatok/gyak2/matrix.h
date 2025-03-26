@@ -25,9 +25,11 @@ void multiply_matrices(const float a[3][3], const float b[3][3], float c[3][3]);
 
 void transform_point(const float transformationMatrix[3][3],const float point[3], float result[3]);
 
-void scale(float transformationMatrix, float scale);
-void shift(float transformationMatrix);
-void rotate(float transformationMatrix);
+void scale(float transformationMatrix[3][3], float lambda);
+
+void shift(float transformationMatrix[3][3], float dx, float dy);
+
+void rotate(float transformationMatrix[3][3], float fi);
 
 #endif // MATRIX_H
 
