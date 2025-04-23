@@ -1,15 +1,11 @@
 #include "app.h"
-
 #include <SDL2/SDL.h>
-
-#include <stdio.h>
 
 /**
 * Main function
 */
 int main(int argc, char* argv[])
 {
-	printf("Game is running...\n");
        App app;
 
     init_app(&app, 800, 600);
@@ -19,6 +15,5 @@ int main(int argc, char* argv[])
         render_app(&app);
     }
     destroy_app(&app);
-
     return 0;
 }

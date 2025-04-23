@@ -17,9 +17,10 @@ This project is a C-based simulation using SDL where a small car moves in a simu
 - **Fog Toggle**: Fog can be turned on and off.
 
 ### UI & Navigation
-- **Tutorial Mode**: A tutorial guides the user on how to control the car.
+- **Help with navigation(I key)**: Pressing I shows an info panel
 - **Escape Key**: Returns to the main menu.
 
 ## Technologies Used
 - **Language**: C
-- **Library**: SDL (Simple DirectMedia Layer)
+- **Library**: SDL (Simple DirectMedia Layer) to create the window and handle input
+- **Library**: OpenGL for 3D rendering
