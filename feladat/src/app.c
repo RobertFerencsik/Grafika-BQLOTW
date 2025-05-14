@@ -186,18 +186,33 @@ void handle_app_events(App* app)
     // Poll and update key states
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
+		switch (event.key.keysym.sym) {
+        case SDLK_f:
+			if (app->scene.fog_enabled)
+				app->scene.fog_enabled = false;
+			else
+				app->scene.fog_enabled = true;
+            break;
+    }
         case SDL_KEYDOWN:
             switch (event.key.keysym.scancode) {
             case SDL_SCANCODE_ESCAPE:
                 app->is_running = false;
                 break;
-				case SDL_SCANCODE_1: app->camera.gear = 1; update_gear_ratio(&(app->camera)); break;
-				case SDL_SCANCODE_2: app->camera.gear = 2; update_gear_ratio(&(app->camera)); break;
-				case SDL_SCANCODE_3: app->camera.gear = 3; update_gear_ratio(&(app->camera)); break;
-				case SDL_SCANCODE_4: app->camera.gear = 4; update_gear_ratio(&(app->camera)); break;
-				case SDL_SCANCODE_5: app->camera.gear = 5; update_gear_ratio(&(app->camera)); break;
-				case SDL_SCANCODE_N: app->camera.gear = 0; update_gear_ratio(&(app->camera)); break;
-				case SDL_SCANCODE_R: app->camera.gear = -1; update_gear_ratio(&(app->camera)); break;
+				case SDL_SCANCODE_F:
+					if (app->scene.fog_enabled){
+						app->scene.fog_enabled = false;
+					} else {
+						app->scene.fog_enabled = true;
+					}
+				break;
+			case SDL_SCANCODE_1: app->camera.gear = 1; update_gear_ratio(&(app->camera)); break;
+			case SDL_SCANCODE_2: app->camera.gear = 2; update_gear_ratio(&(app->camera)); break;
+			case SDL_SCANCODE_3: app->camera.gear = 3; update_gear_ratio(&(app->camera)); break;
+			case SDL_SCANCODE_4: app->camera.gear = 4; update_gear_ratio(&(app->camera)); break;
+			case SDL_SCANCODE_5: app->camera.gear = 5; update_gear_ratio(&(app->camera)); break;
+			case SDL_SCANCODE_N: app->camera.gear = 0; update_gear_ratio(&(app->camera)); break;
+			case SDL_SCANCODE_R: app->camera.gear = -1; update_gear_ratio(&(app->camera)); break;
 
             case SDL_SCANCODE_W:
                 key_w_down = true;

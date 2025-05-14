@@ -2,7 +2,7 @@
 #include <GL/gl.h>
 #include <math.h>
 
-#define BOUNDARY_LIMIT 100.0 
+#define BOUNDARY_LIMIT 96.0 
 #define TREE_X 4.0f
 #define TREE_Y -25.0f
 #define TREE_RADIUS 2.0f  // Adjust depending on how big the tree is

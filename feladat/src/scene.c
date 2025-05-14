@@ -11,12 +11,9 @@ void init_scene(Scene* scene)
 	scene->texture_id_tree = load_texture("assets/textures/tree.jpg");
     scene->texture_id_ground = load_texture("assets/textures/race.webp");
 	
-	scene->sky_front = load_texture("assets/textures/sky_front.png");
-	scene->sky_back = load_texture("assets/textures/sky_back.png");
-	scene->sky_left = load_texture("assets/textures/sky_left.png");
-	scene->sky_right = load_texture("assets/textures/sky_right.png");
-	scene->sky_top = load_texture("assets/textures/sky_top.png");
+	scene->texture_sky = load_texture("assets/textures/sky.jpg");
 
+	scene->fog_enabled = false; 
 
 	scene->material.ambient.red = 0.2;
 	scene->material.ambient.green = 0.2;
@@ -61,6 +58,22 @@ void update_lighting (float x) {
     glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 
+void set_fog(bool enabled)
+{
+    if (enabled) {
+        glEnable(GL_FOG);
+        glFogi(GL_FOG_MODE, GL_LINEAR);
+        GLfloat fogColor[] = { 0.5f, 0.6f, 0.7f, 1.0f };
+        glFogfv(GL_FOG_COLOR, fogColor);
+        glFogf(GL_FOG_DENSITY, 0.06f);
+        glFogf(GL_FOG_START, 3.0f);
+        glFogf(GL_FOG_END, 100.0f);
+        glHint(GL_FOG_HINT, GL_DONT_CARE);
+    } else {
+        glDisable(GL_FOG);
+    }
+}
+
 void set_material(const Material* material)
 {
     float ambient_material_color[] = {
@@ -89,22 +102,21 @@ void set_material(const Material* material)
 
 void update_scene(Scene* scene)
 {
-
+	set_fog(scene->fog_enabled);
 }
 
 void render_scene(const Scene* scene, const Camera* camera)
 {
-	glDisable(GL_LIGHTING);           // Ne világítsuk meg a skyboxot
+	glDisable(GL_LIGHTING);
     draw_skybox(scene, camera);
-    glEnable(GL_LIGHTING);            // Utána vissza lehet kapcsolni
+    glEnable(GL_LIGHTING);
     set_material(&(scene->material));
     set_lighting();
     
     // Draw the ground (bind its texture separately)
-    glBindTexture(GL_TEXTURE_2D, scene->texture_id_ground);  // Bind the ground texture
-    draw_ground(scene);  // Draw the ground with its own texture
+    glBindTexture(GL_TEXTURE_2D, scene->texture_id_ground);
+    draw_ground(scene);
 
-    // Draw tree (bind its texture separately)
     glPushMatrix();                      
 	glBindTexture(GL_TEXTURE_2D, scene->texture_id_tree);
     glRotatef(90, 1.0f, 0.0f, 0.0f);
@@ -155,7 +167,7 @@ void draw_skybox(const Scene* scene, const Camera* camera)
     glTranslatef(camera->position.x, camera->position.y, camera->position.z);
 
     // RIGHT
-    glBindTexture(GL_TEXTURE_2D, scene->sky_right);
+    glBindTexture(GL_TEXTURE_2D, scene->texture_sky);
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(size, size, -size);    
         glTexCoord2f(1, 1); glVertex3f(-size, size, -size);   
@@ -164,7 +176,7 @@ void draw_skybox(const Scene* scene, const Camera* camera)
     glEnd();
 
     // BACK
-    glBindTexture(GL_TEXTURE_2D, scene->sky_back);
+
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(-size, -size, size);    
         glTexCoord2f(1, 1); glVertex3f(-size, -size, -size);   
@@ -173,7 +185,7 @@ void draw_skybox(const Scene* scene, const Camera* camera)
     glEnd();
 	
     // FRONT
-    glBindTexture(GL_TEXTURE_2D, scene->sky_front);
+
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(size, -size, -size);    
         glTexCoord2f(1, 1); glVertex3f(size, -size, size);     
@@ -182,7 +194,7 @@ void draw_skybox(const Scene* scene, const Camera* camera)
     glEnd();
 
     // RIGHT
-    glBindTexture(GL_TEXTURE_2D, scene->sky_right);
+
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(-size, -size, size);    
         glTexCoord2f(1, 1); glVertex3f(size, -size, size);     

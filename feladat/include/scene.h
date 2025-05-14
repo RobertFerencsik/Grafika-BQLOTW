@@ -10,9 +10,10 @@ typedef struct Scene
 {
 	Model tree;
     Material material;
-	GLuint sky_front, sky_back, sky_left, sky_right, sky_top;
+	GLuint texture_sky;
     GLuint texture_id_tree;
 	GLuint texture_id_ground;
+	bool fog_enabled;
 } Scene;
 
 /**
@@ -24,6 +25,11 @@ void init_scene(Scene* scene);
  * Set the lighting of the scene.
  */
 void set_lighting();
+
+/**
+ * Toggle fog on/off
+ */
+void set_fog(bool enabled);
 
 /**
  * Set the current material.
