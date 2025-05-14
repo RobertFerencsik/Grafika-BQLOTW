@@ -145,10 +145,9 @@ void draw_ground(const Scene* scene) {
     glEnd();
 }
 
-
 void draw_skybox(const Scene* scene, const Camera* camera)
 {
-    float size = 90.0f;
+    float size = 100.0f;
 
     glDepthMask(GL_FALSE);
     glEnable(GL_TEXTURE_2D);
@@ -158,42 +157,39 @@ void draw_skybox(const Scene* scene, const Camera* camera)
     // RIGHT
     glBindTexture(GL_TEXTURE_2D, scene->sky_right);
     glBegin(GL_QUADS);
-        glTexCoord2f(0, 1); glVertex3f(size, -size, size);    // Inverted y
-        glTexCoord2f(1, 1); glVertex3f(-size, -size, size);   // Inverted y
-        glTexCoord2f(1, 0); glVertex3f(-size, size, size);    // Inverted y
-        glTexCoord2f(0, 0); glVertex3f(size, size, size);     // Inverted y
+        glTexCoord2f(0, 1); glVertex3f(size, size, -size);    
+        glTexCoord2f(1, 1); glVertex3f(-size, size, -size);   
+        glTexCoord2f(1, 0); glVertex3f(-size, size, size);    
+        glTexCoord2f(0, 0); glVertex3f(size, size, size);     
     glEnd();
 
     // BACK
     glBindTexture(GL_TEXTURE_2D, scene->sky_back);
     glBegin(GL_QUADS);
-        glTexCoord2f(0, 1); glVertex3f(-size, -size, size);    // Inverted y
-        glTexCoord2f(1, 1); glVertex3f(-size, -size, -size);   // Inverted y
-        glTexCoord2f(1, 0); glVertex3f(-size, size, -size);    // Inverted y
-        glTexCoord2f(0, 0); glVertex3f(-size, size, size);     // Inverted y
+        glTexCoord2f(0, 1); glVertex3f(-size, -size, size);    
+        glTexCoord2f(1, 1); glVertex3f(-size, -size, -size);   
+        glTexCoord2f(1, 0); glVertex3f(-size, size, -size);    
+        glTexCoord2f(0, 0); glVertex3f(-size, size, size);     
     glEnd();
 	
     // FRONT
     glBindTexture(GL_TEXTURE_2D, scene->sky_front);
     glBegin(GL_QUADS);
-        glTexCoord2f(0, 1); glVertex3f(size, -size, -size);    // Inverted y
-        glTexCoord2f(1, 1); glVertex3f(size, -size, size);     // Inverted y
-        glTexCoord2f(1, 0); glVertex3f(size, size, size);      // Inverted y
-        glTexCoord2f(0, 0); glVertex3f(size, size, -size);     // Inverted y
+        glTexCoord2f(0, 1); glVertex3f(size, -size, -size);    
+        glTexCoord2f(1, 1); glVertex3f(size, -size, size);     
+        glTexCoord2f(1, 0); glVertex3f(size, size, size);      
+        glTexCoord2f(0, 0); glVertex3f(size, size, -size);     
     glEnd();
 
     // RIGHT
     glBindTexture(GL_TEXTURE_2D, scene->sky_right);
     glBegin(GL_QUADS);
-        glTexCoord2f(0, 1); glVertex3f(-size, -size, size);    // Inverted y
-        glTexCoord2f(1, 1); glVertex3f(size, -size, size);     // Inverted y
-        glTexCoord2f(1, 0); glVertex3f(size, -size, -size);    // Inverted y
-        glTexCoord2f(0, 0); glVertex3f(-size, -size, -size);   // Inverted y
+        glTexCoord2f(0, 1); glVertex3f(-size, -size, size);    
+        glTexCoord2f(1, 1); glVertex3f(size, -size, size);     
+        glTexCoord2f(1, 0); glVertex3f(size, -size, -size);    
+        glTexCoord2f(0, 0); glVertex3f(-size, -size, -size);   
     glEnd();
 
     glPopMatrix();
     glDepthMask(GL_TRUE);
 }
-
-
-
