@@ -13,6 +13,15 @@ typedef struct Camera
     vec3 position;
     vec3 rotation;
     vec3 speed;
+	
+	double acceleration;
+	double max_acceleration;
+	double angular_acceleration;
+    double max_angular_acceleration;
+    int gear;              // Current gear (e.g., -1 for reverse, 0 for neutral, 1-5 for forward gears)
+    float gear_ratio;      // Speed multiplier based on gear
+
+    bool is_preview_visible;
 } Camera;
 
 /**
@@ -26,14 +35,15 @@ void init_camera(Camera* camera);
 void update_camera(Camera* camera, double time);
 
 /**
- * Apply the camera settings to the view transformation.
+ * Update gear ratio.
  */
-void set_view(const Camera* camera);
+void update_gear_ratio(Camera* camera);
+
 
 /**
  * Set the horizontal and vertical rotation of the view angle.
  */
-void rotate_camera(Camera* camera, double horizontal, double vertical);
+void rotate_camera(Camera* camera, double horizontal);
 
 /**
  * Set the speed of forward and backward motion.
@@ -41,8 +51,10 @@ void rotate_camera(Camera* camera, double horizontal, double vertical);
 void set_camera_speed(Camera* camera, double speed);
 
 /**
- * Set the speed of left and right side steps.
+ * Apply the camera settings to the view transformation.
  */
-void set_camera_side_speed(Camera* camera, double speed);
+void set_view(const Camera* camera);
+
+void show_texture_preview();
 
 #endif /* CAMERA_H */

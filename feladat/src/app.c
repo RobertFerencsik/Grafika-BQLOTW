@@ -1,8 +1,8 @@
 #include "app.h"
-
+#include "scene.h"
 #include <stdio.h>
-
 #include <SDL2/SDL_image.h>
+#include <string.h>
 
 void init_app(App* app, int width, int height)
 {
@@ -18,7 +18,7 @@ void init_app(App* app, int width, int height)
     }
 
     app->window = SDL_CreateWindow(
-        "Origin!",
+        "Cube!",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         width, height,
         SDL_WINDOW_OPENGL);
@@ -26,6 +26,8 @@ void init_app(App* app, int width, int height)
         printf("[ERROR] Unable to create the application window!\n");
         return;
     }
+	
+	app->renderer = SDL_CreateRenderer(app->window, -1, SDL_RENDERER_ACCELERATED);
 
     inited_loaders = IMG_Init(IMG_INIT_PNG);
     if (inited_loaders == 0) {
@@ -40,8 +42,8 @@ void init_app(App* app, int width, int height)
     }
 
     init_opengl();
+	SDL_SetRelativeMouseMode(SDL_TRUE); // This hides the cursor and allows infinite movement
     reshape(width, height);
-
     init_camera(&(app->camera));
     init_scene(&(app->scene));
 
@@ -62,7 +64,13 @@ void init_opengl()
 
     glEnable(GL_DEPTH_TEST);
 
+
     glClearDepth(1.0);
+
+    glEnable(GL_TEXTURE_2D);
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
 }
 
 void reshape(GLsizei width, GLsizei height)
@@ -90,19 +98,92 @@ void reshape(GLsizei width, GLsizei height)
     glFrustum(
         -.08, .08,
         -.06, .06,
-        .1, 10
+        .1, 100.0
     );
 }
+
+
+
+typedef struct {
+    const char* title;
+    const char* message;
+} TutorialStep;
+
+void show_instructions(SDL_Window* window) {
+    TutorialStep steps[] = {
+        {
+            "Welcome to the Game!",
+            "In this instruction you can see how to control your vehicle.\n\nPress 'Next' to continue."
+        },
+        {
+            "Movement",
+            "Use W, A,D to move the camera:\nW - Forward and Backward\nA - Left\nD - Right"
+        },
+        {
+            "Shifting Gears",
+            "Use number keys to shift gears:\n1-5: Forward Gears\nN: Neutral\nR: Reverse"
+        },
+        {
+            "Tips",
+            "Hold Shift to boost speed.\nAvoid obstacles and enjoy the ride!"
+        },
+        {
+            "You're Ready!",
+            "Press 'Start Game' to begin your adventure!"
+        }
+    };
+
+    const int total_steps = sizeof(steps) / sizeof(steps[0]);
+    int current_step = 0;
+
+    while (1) {
+        const SDL_MessageBoxButtonData buttons[] = {
+            { /* .flags, .buttonid, .text */ 0, 0, "Back" },
+            { SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, (current_step == total_steps - 1) ? "Start Game" : "Next" },
+            { SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 2, "Exit" }
+        };
+
+        const SDL_MessageBoxData messageboxdata = {
+            SDL_MESSAGEBOX_INFORMATION,
+            window,
+            steps[current_step].title,
+            steps[current_step].message,
+            SDL_arraysize(buttons),
+            buttons,
+            NULL // Color scheme
+        };
+
+        int buttonid;
+        if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
+            SDL_Log("error displaying message box");
+            break;
+        }
+
+        if (buttonid == 0 && current_step > 0) {
+            current_step--; // Back
+        } else if (buttonid == 1) {
+            if (current_step < total_steps - 1)
+                current_step++; // Next
+            else
+                break; // Start Game
+        } else if (buttonid == 2) {
+            // Exit
+            exit(0);
+        }
+    }
+}
+
+
 
 void handle_app_events(App* app)
 {
     SDL_Event event;
-    static bool is_mouse_down = false;
-    static int mouse_x = 0;
-    static int mouse_y = 0;
-    int x;
-    int y;
+    static bool key_w_down = false;
+    static bool key_a_down = false;
+    static bool key_d_down = false;
+    static bool handbrake_engaged = false;
 
+    // Poll and update key states
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
         case SDL_KEYDOWN:
@@ -110,58 +191,84 @@ void handle_app_events(App* app)
             case SDL_SCANCODE_ESCAPE:
                 app->is_running = false;
                 break;
+				case SDL_SCANCODE_1: app->camera.gear = 1; update_gear_ratio(&(app->camera)); break;
+				case SDL_SCANCODE_2: app->camera.gear = 2; update_gear_ratio(&(app->camera)); break;
+				case SDL_SCANCODE_3: app->camera.gear = 3; update_gear_ratio(&(app->camera)); break;
+				case SDL_SCANCODE_4: app->camera.gear = 4; update_gear_ratio(&(app->camera)); break;
+				case SDL_SCANCODE_5: app->camera.gear = 5; update_gear_ratio(&(app->camera)); break;
+				case SDL_SCANCODE_N: app->camera.gear = 0; update_gear_ratio(&(app->camera)); break;
+				case SDL_SCANCODE_R: app->camera.gear = -1; update_gear_ratio(&(app->camera)); break;
+
             case SDL_SCANCODE_W:
-                set_camera_speed(&(app->camera), 1);
-                break;
-            case SDL_SCANCODE_S:
-                set_camera_speed(&(app->camera), -1);
+                key_w_down = true;
                 break;
             case SDL_SCANCODE_A:
-                set_camera_side_speed(&(app->camera), 1);
+                key_a_down = true;
                 break;
             case SDL_SCANCODE_D:
-                set_camera_side_speed(&(app->camera), -1);
+                key_d_down = true;
+                break;
+            case SDL_SCANCODE_I:
+                show_instructions(app->window);
                 break;
             default:
                 break;
             }
             break;
+
         case SDL_KEYUP:
             switch (event.key.keysym.scancode) {
             case SDL_SCANCODE_W:
-            case SDL_SCANCODE_S:
-                set_camera_speed(&(app->camera), 0);
+                key_w_down = false;
                 break;
             case SDL_SCANCODE_A:
+                key_a_down = false;
+                break;
             case SDL_SCANCODE_D:
-                set_camera_side_speed(&(app->camera), 0);
+                key_d_down = false;
+                break;
+            case SDL_SCANCODE_SPACE:
+                handbrake_engaged = false;
                 break;
             default:
                 break;
             }
             break;
-        case SDL_MOUSEBUTTONDOWN:
-            is_mouse_down = true;
-            break;
-        case SDL_MOUSEMOTION:
-            SDL_GetMouseState(&x, &y);
-            if (is_mouse_down) {
-                rotate_camera(&(app->camera), mouse_x - x, mouse_y - y);
-            }
-            mouse_x = x;
-            mouse_y = y;
-            break;
-        case SDL_MOUSEBUTTONUP:
-            is_mouse_down = false;
-            break;
+
         case SDL_QUIT:
             app->is_running = false;
             break;
+
         default:
             break;
         }
     }
+
+    // Apply combined input logic outside event loop
+    if (!handbrake_engaged) {
+        if (key_w_down) {
+            set_camera_speed(&(app->camera), 10.0);
+		} else {
+            set_camera_speed(&(app->camera), 0.0);
+        }
+    }
+	
+    if (key_a_down && key_w_down) {
+		if(app->camera.angular_acceleration < app->camera.max_angular_acceleration) {
+			app->camera.angular_acceleration +=0.03;
+		}
+        rotate_camera(&(app->camera), app->camera.angular_acceleration);
+    } else if (key_d_down && key_w_down) {
+		if(app->camera.angular_acceleration > -(app->camera.max_angular_acceleration)) {
+			app->camera.angular_acceleration -=0.03;
+		}
+        rotate_camera(&(app->camera), app->camera.angular_acceleration);
+    } else {
+		app->camera.angular_acceleration = 0; 
+	}
 }
+
+
 
 void update_app(App* app)
 {
@@ -183,9 +290,8 @@ void render_app(App* app)
 
     glPushMatrix();
     set_view(&(app->camera));
-    render_scene(&(app->scene));
+    render_scene(&(app->scene),&(app->camera));
     glPopMatrix();
-
     SDL_GL_SwapWindow(app->window);
 }
 

@@ -1,8 +1,5 @@
-CC=gcc
-CFLAGS=-Iinclude
-SRC=$(wildcard src/*.c)
-OUT=run.exe
-LIBS=-lmingw32 -lSDL2main -lSDL2_image -lSDL2 -lopengl32
-
 all:
-	$(CC) $(CFLAGS) $(SRC) -o $(OUT) $(LIBS)
+	gcc -Iinclude/ src/app.c src/camera.c src/main.c src/scene.c src/texture.c src/utils.c -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lobj -lopengl32 -lm -o needforslow.exe -Wall -Wextra -Wpedantic
+
+linux:
+	gcc -Iinclude/ src/app.c src/camera.c src/main.c src/scene.c src/texture.c src/utils.c -lobj -lSDL2 -lSDL2_image -lGL -lm -o needforslow -Wall -Wextra -Wpedantic

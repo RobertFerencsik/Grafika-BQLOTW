@@ -22,6 +22,17 @@ typedef struct Color
 } Color;
 
 /**
+ * Material
+ */
+typedef struct Material
+{
+    struct Color ambient;
+    struct Color diffuse;
+    struct Color specular;
+    float shininess;
+} Material;
+
+/**
  * Calculates radian from degree.
  */
 double degree_to_radian(double degree);
