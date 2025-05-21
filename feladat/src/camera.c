@@ -1,6 +1,7 @@
 #include "camera.h"
 #include <GL/gl.h>
 #include <math.h>
+#include <stdio.h>
 
 #define BOUNDARY_LIMIT 96.0 
 #define TREE_X 4.0f
@@ -31,6 +32,10 @@ void init_camera(Camera* camera)
 	camera->gear_ratio = 0.0f;
 }
 
+void write_position(Camera* camera) {
+	printf("x: %lf, y: %lf, z: %lf", camera->position.x, camera->position.y, camera->position.z);
+}
+
 void update_camera(Camera* camera, double time)
 {
     double angle;
@@ -39,7 +44,7 @@ void update_camera(Camera* camera, double time)
 	double prev_x = camera->position.x;
     double prev_y = camera->position.y;
 
-    angle = degree_to_radian(camera->rotation.z);
+	angle = degree_to_radian(camera->rotation.z);
     side_angle = degree_to_radian(camera->rotation.z + 90.0);
 
     camera->position.x += cos(angle) * camera->speed.y * time;

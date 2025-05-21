@@ -1,5 +1,6 @@
 #include "app.h"
 #include "scene.h"
+#include "camera.h"
 #include <stdio.h>
 #include <SDL2/SDL_image.h>
 #include <string.h>
@@ -117,15 +118,15 @@ void show_instructions(SDL_Window* window) {
         },
         {
             "Movement",
-            "Use W, A,D to move the camera:\nW - Forward and Backward\nA - Left\nD - Right"
+            "Use up, left, right to move the camera:\nW - Forward and Backward\nA - Left\nD - Right"
         },
         {
             "Shifting Gears",
             "Use number keys to shift gears:\n1-5: Forward Gears\nN: Neutral\nR: Reverse"
         },
-        {
-            "Tips",
-            "Hold Shift to boost speed.\nAvoid obstacles and enjoy the ride!"
+		{
+            "Toggle fog",
+            "Use the key I to toggle fog on/off"
         },
         {
             "You're Ready!",
@@ -213,14 +214,16 @@ void handle_app_events(App* app)
 			case SDL_SCANCODE_5: app->camera.gear = 5; update_gear_ratio(&(app->camera)); break;
 			case SDL_SCANCODE_N: app->camera.gear = 0; update_gear_ratio(&(app->camera)); break;
 			case SDL_SCANCODE_R: app->camera.gear = -1; update_gear_ratio(&(app->camera)); break;
-
-            case SDL_SCANCODE_W:
+			case SDL_SCANCODE_P:
+				write_position(&(app->camera));
+				break;
+            case SDL_SCANCODE_UP:
                 key_w_down = true;
                 break;
-            case SDL_SCANCODE_A:
+            case SDL_SCANCODE_LEFT:
                 key_a_down = true;
                 break;
-            case SDL_SCANCODE_D:
+            case SDL_SCANCODE_RIGHT:
                 key_d_down = true;
                 break;
             case SDL_SCANCODE_I:
@@ -233,13 +236,13 @@ void handle_app_events(App* app)
 
         case SDL_KEYUP:
             switch (event.key.keysym.scancode) {
-            case SDL_SCANCODE_W:
+            case SDL_SCANCODE_UP:
                 key_w_down = false;
                 break;
-            case SDL_SCANCODE_A:
+            case SDL_SCANCODE_LEFT:
                 key_a_down = false;
                 break;
-            case SDL_SCANCODE_D:
+            case SDL_SCANCODE_RIGHT:
                 key_d_down = false;
                 break;
             case SDL_SCANCODE_SPACE:

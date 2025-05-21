@@ -1,6 +1,7 @@
 #include "scene.h"
 #include "camera.h"
 
+#include <math.h>
 #include <obj/load.h>
 #include <obj/draw.h>
 
@@ -13,7 +14,8 @@ void init_scene(Scene* scene)
 	
 	scene->texture_sky = load_texture("assets/textures/sky.jpg");
 
-	scene->fog_enabled = false; 
+	scene->fog_enabled = false;
+	scene->time_of_day = 1.0f;
 
 	scene->material.ambient.red = 0.2;
 	scene->material.ambient.green = 0.2;
@@ -31,7 +33,7 @@ void init_scene(Scene* scene)
 
 }
 
-
+/*
 void set_lighting()
 {
 	
@@ -44,18 +46,26 @@ void set_lighting()
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light);
     glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
+*/
 
-void update_lighting (float x) {
-	
-	
-	float ambient_light[] = { 0.3f, 0.3f, 0.3f, 1.0f };  // Global light
-    float diffuse_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // Main white light
-    float specular_light[] = { 1.0f, 1.0f, 1.0f, 1.0f }; // Shiny specular
-    float position[] = { 100.0f, 100.0f, 100.0f, 1.0f };       // Light above and to the side
+void update_lighting(float time_of_day) {
+    float radius = 100.0f;
+    float sun_x = radius * cosf(time_of_day);
+    float sun_y = radius * sinf(time_of_day);
+    float sun_z = 100.0;
+
+    float position[] = { sun_x, sun_y, sun_z, 1.0f };
+
+    float intensity = fmaxf(0.6f, sinf(time_of_day));
+
+    float ambient_light[]  = { 0.3f * intensity, 0.3f * intensity, 0.3f * intensity, 1.0f };
+    float diffuse_light[]  = { 1.0f * intensity, 1.0f * intensity, 0.9f * intensity, 1.0f };
+    float specular_light[] = { 1.0f * intensity, 1.0f * intensity, 1.0f * intensity, 1.0f };
+
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light);
-    glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 
 void set_fog(bool enabled)
@@ -103,17 +113,25 @@ void set_material(const Material* material)
 void update_scene(Scene* scene)
 {
 	set_fog(scene->fog_enabled);
+
+
+	scene->time_of_day += 0.005f;
+    if (scene->time_of_day > 2 * M_PI) {
+        scene->time_of_day -= 2 * M_PI;
+    }
+
+    update_lighting(scene->time_of_day);
+
 }
 
 void render_scene(const Scene* scene, const Camera* camera)
 {
-	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHTING); 
     draw_skybox(scene, camera);
-    glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING); 
     set_material(&(scene->material));
-    set_lighting();
+	//set_lighting();
     
-    // Draw the ground (bind its texture separately)
     glBindTexture(GL_TEXTURE_2D, scene->texture_id_ground);
     draw_ground(scene);
 

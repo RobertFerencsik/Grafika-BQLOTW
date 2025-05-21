@@ -14,7 +14,9 @@ typedef struct Scene
     GLuint texture_id_tree;
 	GLuint texture_id_ground;
 	bool fog_enabled;
+	float time_of_day;
 } Scene;
+
 
 /**
  * Initialize the scene by loading models.
@@ -22,9 +24,9 @@ typedef struct Scene
 void init_scene(Scene* scene);
 
 /**
- * Set the lighting of the scene.
+ * Simulates the movement and the intensity of the sun.
  */
-void set_lighting();
+void update_lighting(float time_of_day);
 
 /**
  * Toggle fog on/off

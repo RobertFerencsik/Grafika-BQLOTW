@@ -30,6 +30,11 @@ typedef struct Camera
 void init_camera(Camera* camera);
 
 /**
+ * Writes the camera position onto the console.
+ */
+void write_position(Camera* camera);
+
+/**
  * Update the position of the camera.
  */
 void update_camera(Camera* camera, double time);
