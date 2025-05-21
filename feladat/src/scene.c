@@ -8,8 +8,10 @@
 void init_scene(Scene* scene)
 {
     load_model(&(scene->tree), "assets/models/tree.obj");
+	load_model(&(scene->car), "assets/models/car.obj");
     
 	scene->texture_id_tree = load_texture("assets/textures/tree.jpg");
+	scene->texture_id_paint = load_texture("assets/textures/paint.webp");
     scene->texture_id_ground = load_texture("assets/textures/race.webp");
 	
 	scene->texture_sky = load_texture("assets/textures/sky.jpg");
@@ -142,12 +144,32 @@ void render_scene(const Scene* scene, const Camera* camera)
     draw_model(&(scene->tree));
     glPopMatrix();
 	
+	
+	// Draw the car in front of the camera
+	glPushMatrix();
+
+	float offset_distance = 2.0f;
+	float angle_rad = degree_to_radian(camera->rotation.z);
+
+	float car_x = camera->position.x + cos(angle_rad) * offset_distance;
+	float car_y = camera->position.y + sin(angle_rad) * offset_distance;
+
+	glTranslatef(car_x, car_y, -1.0f);  // Align with camera
+	glRotatef(camera->rotation.z, 0.0f, 0.0f, 1.0f);  // Face same direction
+
+	glBindTexture(GL_TEXTURE_2D, scene->texture_id_paint);
+	draw_model(&(scene->car));
+
+	glPopMatrix();
+	
+	/*
 	glPushMatrix();                      
-	glBindTexture(GL_TEXTURE_2D, scene->texture_id_tree);
+	glBindTexture(GL_TEXTURE_2D, scene->texture_id_paint);
     glRotatef(90, 1.0f, 0.0f, 0.0f);
-    glTranslatef(4.0f, -1.0f, 25.0f);
-    draw_model(&(scene->tree));
+    glTranslatef(10.0f, -1.0f, 25.0f);
+    draw_model(&(scene->car));
     glPopMatrix();
+	*/
 }
 
 void draw_ground(const Scene* scene) {

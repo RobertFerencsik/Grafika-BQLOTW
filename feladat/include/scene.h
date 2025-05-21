@@ -9,7 +9,9 @@
 typedef struct Scene
 {
 	Model tree;
+	Model car;
     Material material;
+	GLuint texture_id_paint;
 	GLuint texture_sky;
     GLuint texture_id_tree;
 	GLuint texture_id_ground;
